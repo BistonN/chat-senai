@@ -1,33 +1,39 @@
+var nickname = null;
+var client = null;
 
-// Create a client instance
-var client = new Paho.Client('broker.emqx.io', 8083, "clientId1");
+function conectar() {
+  nickname = document.getElementById('nickname').value;
 
-// set callback handlers
-client.onConnectionLost = onConnectionLost;
-client.onMessageArrived = onMessageArrived;
+  if (nickname.length) {
+    client = new Paho.Client('broker.emqx.io', 8083, nickname);
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessageArrived;
+    client.connect({ onSuccess: onConnect });
 
-// connect the client
-client.connect({onSuccess:onConnect});
-
-
-// called when the client connects
-function onConnect() {
-  // Once a connection has been made, make a subscription and send a message.
-  console.log("onConnect");
-  client.subscribe("World");
-  message = new Paho.Message("clientId1 Hello");
-  message.destinationName = "World";
-  client.send(message);
-}
-
-// called when the client loses its connection
-function onConnectionLost(responseObject) {
-  if (responseObject.errorCode !== 0) {
-    console.log("onConnectionLost:"+responseObject.errorMessage);
+  } else {
+    alert('Digite um nickname!');
   }
 }
 
-// called when a message arrives
+function onConnect() {
+  console.log("onConnect");
+  client.subscribe("senai_web_designer");
+}
+
+function onConnectionLost(responseObject) {
+  if (responseObject.errorCode !== 0) {
+    console.log("onConnectionLost:" + responseObject.errorMessage);
+  }
+}
+
 function onMessageArrived(message) {
-  console.log("onMessageArrived:"+message.payloadString);
+  console.log("onMessageArrived:" + message.payloadString);
+}
+
+function enviarMensagem() {
+  var texto = document.getElementById('text-area').value;
+  texto = nickname + ' @@ ' + texto;
+  message = new Paho.Message(texto);
+  message.destinationName = "senai_web_designer";
+  client.send(message);
 }
