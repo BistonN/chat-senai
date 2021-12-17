@@ -28,6 +28,34 @@ function onConnectionLost(responseObject) {
 
 function onMessageArrived(message) {
   console.log("onMessageArrived:" + message.payloadString);
+  var nick = message.payloadString.split(' @@ ')[0];
+  var mensagem = message.payloadString.split(' @@ ')[1];
+  mostrarMensagem(nick, mensagem);
+}
+
+function mostrarMensagem(nick, mensagem) {
+  var mHtml = '';
+
+  if (nick === nickname) {
+    mHtml = `
+     <div class="message right">
+        <div class="bg-message">
+            <div class="user">${nick}</div>
+            <div class="content">${mensagem}</div>
+        </div>
+      </div>`;
+  } else {
+    mHtml = `
+    <div class="message">
+        <div class="bg-message">
+          <div class="user">${nick}</div>
+          <div class="content">${mensagem}</div>
+      </div>
+    </div>`;
+  }
+
+  var novaMensagem = document.getElementById('messages');
+  novaMensagem.innerHTML = novaMensagem.innerHTML + mHtml;
 }
 
 function enviarMensagem() {
