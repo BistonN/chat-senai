@@ -1,5 +1,6 @@
 var nickname = null;
 var client = null;
+var cooldown = true;
 
 function conectar() {
   nickname = document.getElementById('nickname').value;
@@ -17,12 +18,31 @@ function conectar() {
 
 function onConnect() {
   console.log("onConnect");
-  client.subscribe("senai_web_designer");
+  mostrarMensagemLog('Você foi conectado!');
+  client.subscribe('senai_web_designer');
+}
+
+function mostrarMensagemLog(texto) {
+  var mensagens = document.getElementById('messages');
+  mensagens.innerHTML = mensagens.innerHTML + `
+  <div class="message center">
+    <div class="bg-message">
+        <div class="user">Biston</div>
+        <div class="content">${texto}</div>
+    </div>
+  </div>`;
+}
+
+function desconectar() {
+  client.disconnect();
+  console.log('Disconnect');
+  mostrarMensagemLog('Você foi desconectado!');
 }
 
 function onConnectionLost(responseObject) {
   if (responseObject.errorCode !== 0) {
     console.log("onConnectionLost:" + responseObject.errorMessage);
+    mostrarMensagemLog('Conexão perdida!');
   }
 }
 
@@ -56,12 +76,24 @@ function mostrarMensagem(nick, mensagem) {
 
   var novaMensagem = document.getElementById('messages');
   novaMensagem.innerHTML = novaMensagem.innerHTML + mHtml;
+
+  novaMensagem.scrollTop = novaMensagem.scrollTop + 1000;
+}
+
+const esperarSegundos = async (tempoEspera) => {
+  cooldown = false;
+  setTimeout(() => {
+    cooldown = true;
+  }, tempoEspera * 1000);
 }
 
 function enviarMensagem() {
-  var texto = document.getElementById('text-area').value;
-  texto = nickname + ' @@ ' + texto;
-  message = new Paho.Message(texto);
-  message.destinationName = "senai_web_designer";
-  client.send(message);
+  if (cooldown) {
+    var texto = document.getElementById('text-area').value;
+    texto = nickname + ' @@ ' + texto;
+    message = new Paho.Message(texto);
+    message.destinationName = "senai_web_designer";
+    client.send(message);
+    esperarSegundos(3);
+  }
 }

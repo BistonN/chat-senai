@@ -80,3 +80,22 @@ body {
 .btn-sm {
     margin-left: 10px;
 }
+
+.center {
+    justify-content: center;
+    text-align: center; 
+}
+
+.center .user {
+    opacity: 0;
+    display: none;
+}
+
+.center .bg-message {
+    background-color: #d3daff;
+    border-radius: 8px;
+}
+
+textarea {
+    resize: none;
+}
